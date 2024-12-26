@@ -1,1 +1,48 @@
 %h1 Rails Paywall Demo
+
+%form#payment-form
+  #card-element
+  %button{ type: 'submit' } Pay
+
+:javascript
+  document.addEventListener("DOMContentLoaded", function() {
+    const stripe = Stripe('#{ENV['STRIPE_PUBLISHABLE_KEY']}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    const form = document.getElementById('payment-form');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+      const response = await fetch('/payments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        },
+        body: JSON.stringify({ payment: { amount: 10000 } })
+      });
+
+      if (!response.ok) {
+        console.error('Error:', response.statusText);
+        return;
+      }
+
+      const { client_secret } = await response.json();
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: cardElement,
+        },
+      });
+
+      if (error) {
+        console.error(error);
+      } else {
+        console.log('Payment successful!', paymentIntent);
+      }
+    });
+  });

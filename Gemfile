@@ -21,7 +21,9 @@ gem "haml-rails"
 # Use paypal checkout [https://developer.paypal.com/docs/checkout/]
 gem 'paypal-sdk-rest'
 # Use dotenv to load environment variables from .env into ENV in development and test [
-  gem 'dotenv-rails', groups: [:development, :test]
+gem 'dotenv-rails', groups: [:development, :test]
+# Use stripe checkout [https://stripe.com/docs/payments/checkout]
+gem 'stripe'
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
