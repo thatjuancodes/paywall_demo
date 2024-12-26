@@ -11,6 +11,8 @@
   #card-element
   %button{ type: 'submit' } Pay
 
+  #payment-message
+
 :javascript
   document.addEventListener("DOMContentLoaded", function() {
     const stripe = Stripe('#{ENV['STRIPE_PUBLISHABLE_KEY']}');
@@ -36,6 +38,7 @@
 
       if (!response.ok) {
         console.error('Error:', response.statusText);
+        document.getElementById('payment-message').innerText = 'Payment failed. Please try again.';
         return;
       }
 
@@ -52,8 +55,10 @@
 
       if (error) {
         console.error('Error:', error.message);
+        document.getElementById('payment-message').innerText = `Payment failed: ${error.message}`;
       } else {
         console.log('PaymentIntent:', paymentIntent);
+        document.getElementById('payment-message').innerText = 'Payment successful!';
       }
     });
   });
