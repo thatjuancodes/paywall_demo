@@ -1,6 +1,13 @@
 %h1 Rails Paywall Demo
 
 %form#payment-form
+  .package
+    %input{ type: 'radio', name: 'package', value: '5000', id: 'package-50' }
+    %label{ for: 'package-50' } $50 Package
+  .package
+    %input{ type: 'radio', name: 'package', value: '10000', id: 'package-100' }
+    %label{ for: 'package-100' } $100 Package
+
   #card-element
   %button{ type: 'submit' } Pay
 
@@ -16,6 +23,7 @@
       event.preventDefault();
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+      const selectedPackage = document.querySelector('input[name="package"]:checked').value;
 
       const response = await fetch('/payments', {
         method: 'POST',
@@ -23,7 +31,7 @@
           'Content-Type': 'application/json',
           'X-CSRF-Token': csrfToken
         },
-        body: JSON.stringify({ payment: { amount: 10000 } })
+        body: JSON.stringify({ payment: { amount: selectedPackage } })
       });
 
       if (!response.ok) {
@@ -36,13 +44,16 @@
       const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
         payment_method: {
           card: cardElement,
-        },
+          billing_details: {
+            name: 'Jenny Rosen'
+          }
+        }
       });
 
       if (error) {
-        console.error(error);
+        console.error('Error:', error.message);
       } else {
-        console.log('Payment successful!', paymentIntent);
+        console.log('PaymentIntent:', paymentIntent);
       }
     });
   });
